@@ -5,6 +5,9 @@ const client = axios.create({
   baseURL: import.meta.env.DEV
     ? '/api'
     : (import.meta.env.VITE_JUJURIS_API_URL ?? 'http://localhost:3001'),
+  headers: {
+    'X-API-Key': import.meta.env.VITE_JUJURIS_API_KEY ?? '',
+  },
 });
 
 // Cache simples para a página de detalhe acessar o resultado completo
