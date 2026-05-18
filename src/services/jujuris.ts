@@ -7,6 +7,7 @@ const client = axios.create({
     : (import.meta.env.VITE_JUJURIS_API_URL ?? 'http://localhost:3001'),
   headers: {
     'X-API-Key': import.meta.env.VITE_JUJURIS_API_KEY ?? '',
+    'ngrok-skip-browser-warning': 'true',
   },
 });
 
