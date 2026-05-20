@@ -13,7 +13,7 @@ export default defineConfig(({ command }) => ({
         rewrite: (path) => path.replace(/^\/datajud/, ''),
       },
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://34.39.181.245:3001',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
