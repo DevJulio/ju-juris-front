@@ -31,7 +31,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_JUJURIS_API_URL: https://mckenzie-chairless-becomingly.ngrok-free.dev
+          VITE_JUJURIS_API_URL: https://jujuris.duckdns.org
           VITE_JUJURIS_API_KEY: ${{ secrets.VITE_JUJURIS_API_KEY }}
 
       - uses: actions/upload-pages-artifact@v3
