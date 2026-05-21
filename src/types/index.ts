@@ -44,12 +44,20 @@ export interface Processo {
 
 export interface SearchFilters {
   texto: string;
+  campoPesquisa?: string;
   numeroProcesso?: string;
-  grau?: string;
-  classeNome?: string;
-  orgaoJulgador?: string;
+  instancia?: string;
+  area?: string;
+  orgaoMateria?: string;
+  unidade?: string;
+  unidadeId?: string;
+  magistrado?: string;
+  magistradoId?: string;
+  tipoAto?: string;
+  tipoAtoId?: string;
   dataInicio?: string;
   dataFim?: string;
+  quantidade?: string;
 }
 
 export interface SearchResult {
@@ -78,6 +86,16 @@ export interface JurisprudenciaBusca {
 
 export interface JurisprudenciaFilters {
   texto?: string;
+  campoPesquisa?: string;
+  instancia?: string;
+  area?: string;
+  orgaoMateria?: string;
+  unidade?: string;
+  unidadeId?: string;
+  magistrado?: string;
+  magistradoId?: string;
+  tipoAto?: string;
+  tipoAtoId?: string;
   numeroProcesso?: string;
   dataInicial?: string;
   dataFinal?: string;

@@ -22,12 +22,18 @@ const RESULTS_PER_PAGE = 10;
 function filtersFromParams(params: URLSearchParams): SearchFilters {
   return {
     texto: params.get('texto') ?? '',
+    campoPesquisa: params.get('campoPesquisa') ?? '',
     numeroProcesso: params.get('numeroProcesso') ?? '',
-    grau: params.get('grau') ?? '',
-    classeNome: params.get('classeNome') ?? '',
-    orgaoJulgador: params.get('orgaoJulgador') ?? '',
+    instancia: params.get('instancia') ?? '',
+    area: params.get('area') ?? '',
+    orgaoMateria: params.get('orgaoMateria') ?? '',
+    unidade: params.get('unidade') ?? '',
+    magistrado: params.get('magistrado') ?? '',
+    tipoAto: params.get('tipoAto') ?? '',
+    tipoAtoId: params.get('tipoAtoId') ?? '',
     dataInicio: params.get('dataInicio') ?? '',
     dataFim: params.get('dataFim') ?? '',
+    quantidade: params.get('quantidade') ?? '10',
   };
 }
 
@@ -42,12 +48,58 @@ function toJurisprudenciaFilters(f: SearchFilters): JurisprudenciaFilters {
     d.length === 10 && d[4] === '-'
       ? `${d.slice(8, 10)}/${d.slice(5, 7)}/${d.slice(0, 4)}`
       : d;
-  return {
+
+  const payload: JurisprudenciaFilters = {
     texto: f.texto || undefined,
+    campoPesquisa: f.campoPesquisa || undefined,
+    instancia: f.instancia || undefined,
+    area: f.area || undefined,
+    orgaoMateria: f.orgaoMateria || undefined,
+    unidade: f.unidade || undefined,
+    magistrado: f.magistrado || undefined,
+    tipoAto: f.tipoAto || undefined,
+    tipoAtoId: f.tipoAtoId || undefined,
     numeroProcesso: f.numeroProcesso || undefined,
     dataInicial: f.dataInicio ? fmt(f.dataInicio) : undefined,
     dataFinal: f.dataFim ? fmt(f.dataFim) : undefined,
+    quantidade: f.quantidade ? Number(f.quantidade) : undefined,
   };
+
+  const texto = f.texto?.trim();
+  if (!texto) return payload;
+
+  if (f.campoPesquisa === 'recursoProcCnj' && !payload.numeroProcesso) {
+    payload.numeroProcesso = texto;
+    payload.texto = undefined;
+  }
+
+  if (f.campoPesquisa === 'relator' && !payload.magistrado) {
+    payload.magistrado = texto;
+    payload.texto = undefined;
+  }
+
+  if (f.campoPesquisa === 'comarca' && !payload.unidade) {
+    payload.unidade = texto;
+    payload.texto = undefined;
+  }
+
+  if (f.campoPesquisa === 'dataAcordao' && !payload.dataInicial && !payload.dataFinal) {
+    payload.dataInicial = fmt(texto);
+    payload.dataFinal = fmt(texto);
+    payload.texto = undefined;
+  }
+
+  if (f.campoPesquisa === 'ementa') {
+    payload.tipoAto = 'Ementa';
+    payload.tipoAtoId = '124';
+  }
+
+  if (f.campoPesquisa === 'decisao') {
+    payload.tipoAto = 'Decisão';
+    payload.tipoAtoId = '15';
+  }
+
+  return payload;
 }
 
 
@@ -55,20 +107,30 @@ export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const filters = filtersFromParams(searchParams);
   const pagina = pageFromParams(searchParams);
-  const hasSearched = Array.from(searchParams.values()).some(v => v !== '');
+  const hasSearched = Array.from(searchParams.entries()).some(
+    ([key, value]) => key !== 'quantidade' && key !== 'pagina' && value !== '',
+  );
 
   const { data, isFetching, error } = useQuery({
     queryKey: ['jurisprudencia', filters, pagina],
     queryFn: () => buscarJurisprudencia({ ...toJurisprudenciaFilters(filters), pagina }),
     enabled: hasSearched,
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
   });
 
-  const totalPages = data ? Math.min(Math.ceil(data.total / RESULTS_PER_PAGE), 10000) : 0;
+  const resultsPerPage = Number(filters.quantidade || RESULTS_PER_PAGE);
+  const totalPages = data ? Math.min(Math.ceil(data.total / resultsPerPage), 10000) : 0;
 
   function handleSearch(f: SearchFilters) {
     const params: Record<string, string> = {};
-    Object.entries(f).forEach(([k, v]) => { if (v) params[k] = v; });
+    Object.entries(f).forEach(([k, v]) => {
+      if (!v) return;
+      if (k === 'quantidade' && v === '10') return;
+      params[k] = v;
+    });
     setSearchParams(params); // reseta para página 1 em nova busca
   }
 

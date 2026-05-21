@@ -31,16 +31,16 @@ export async function searchProcessos(
     must.push({ term: { numeroProcesso: filters.numeroProcesso.replace(/\D/g, '') } });
   }
 
-  if (filters.grau) {
-    must.push({ match: { grau: filters.grau } });
+  if (filters.instancia) {
+    must.push({ match: { grau: filters.instancia } });
   }
 
-  if (filters.classeNome) {
-    must.push({ match: { 'classe.nome': filters.classeNome } });
+  if (filters.orgaoMateria) {
+    must.push({ match: { 'classe.nome': filters.orgaoMateria } });
   }
 
-  if (filters.orgaoJulgador) {
-    must.push({ match: { 'orgaoJulgador.nome': filters.orgaoJulgador } });
+  if (filters.unidade) {
+    must.push({ match: { 'orgaoJulgador.nome': filters.unidade } });
   }
 
   if (filters.dataInicio || filters.dataFim) {
